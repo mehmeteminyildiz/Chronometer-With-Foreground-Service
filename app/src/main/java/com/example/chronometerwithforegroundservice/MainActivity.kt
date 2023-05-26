@@ -8,6 +8,7 @@ import com.example.chronometerwithforegroundservice.databinding.ActivityMainBind
 import com.example.chronometerwithforegroundservice.model.TimerEvent
 import com.example.chronometerwithforegroundservice.service.TimerService
 import com.example.chronometerwithforegroundservice.util.Constants
+import com.example.chronometerwithforegroundservice.util.TimerUtil
 
 class MainActivity : AppCompatActivity() {
 
@@ -44,6 +45,12 @@ class MainActivity : AppCompatActivity() {
                     isTimerRunning = false
                     binding.fab.setImageResource(R.drawable.baseline_timer_24)
                 }
+            }
+        })
+
+        TimerService.timerInMillis.observe(this, Observer {
+            binding.apply {
+                tvTimer.text = TimerUtil.getFormattedTime(it, true)
             }
         })
     }
