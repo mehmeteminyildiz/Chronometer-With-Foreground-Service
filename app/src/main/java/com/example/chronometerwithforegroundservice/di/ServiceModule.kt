@@ -22,6 +22,7 @@ import timber.log.Timber
 @InstallIn(ServiceComponent::class)
 object ServiceModule {
 
+    /** NotificationManagerCompat'ın sağlanması **/
     @ServiceScoped
     @Provides
     fun provideNotificationManager(
@@ -29,6 +30,7 @@ object ServiceModule {
     ) = NotificationManagerCompat.from(context)
 
 
+    /** NotificationManagerCompat.Builder'ın sağlanması **/
     @ServiceScoped
     @Provides
     fun provideNotificationBuilder(
@@ -43,6 +45,7 @@ object ServiceModule {
         .setContentText("00:00:00")
         .setContentIntent(pendingIntent)
 
+    /** PendingIntent'in sağlanması **/
     @ServiceScoped
     @Provides
     fun provideMainActivityPendingIntent(

@@ -3,7 +3,6 @@ package com.example.chronometerwithforegroundservice.service
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager.IMPORTANCE_LOW
-import android.app.PendingIntent
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
@@ -14,8 +13,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import com.example.chronometerwithforegroundservice.MainActivity
-import com.example.chronometerwithforegroundservice.R
 import com.example.chronometerwithforegroundservice.model.TimerEvent
 import com.example.chronometerwithforegroundservice.util.Constants
 import com.example.chronometerwithforegroundservice.util.Constants.NOTIFICATION_CHANNEL_ID
@@ -42,14 +39,14 @@ class TimerService : LifecycleService() {
     lateinit var notificationManager: NotificationManagerCompat
 
     @Inject
-    lateinit var notificationBuilder : NotificationCompat.Builder
+    lateinit var notificationBuilder: NotificationCompat.Builder
     override fun onCreate() {
         super.onCreate()
         initValues()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-
+        /** startService() metodu ile bu metot tetiklenir **/
         intent?.let {
             when (it.action) {
                 Constants.ACTION_START_SERVICE -> startForegroundService()
@@ -62,6 +59,7 @@ class TimerService : LifecycleService() {
     }
 
 
+    /** Servis başlatılır **/
     private fun startForegroundService() {
         timerEvent.postValue(TimerEvent.START)
         startTimer()
@@ -70,31 +68,39 @@ class TimerService : LifecycleService() {
         }
 
         startForeground(Constants.NOTIFICATION_ID, notificationBuilder.build())
+        observeMillis()
+    }
 
-        timerInMillis.observe(this, Observer {
-            if (!isServiceStopped) {
-                val builder = notificationBuilder.setContentText(
-                    TimerUtil.getFormattedTime(it, false)
-                )
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.POST_NOTIFICATIONS
-                    ) != PackageManager.PERMISSION_GRANTED
-                ) {
-                    return@Observer
+    /** Notification'da bulunan timer'ı sürekli günceller **/
+    private fun observeMillis() {
+        timerInMillis.observe(
+            this,
+            Observer {
+                if (!isServiceStopped) {
+                    val builder = notificationBuilder.setContentText(
+                        TimerUtil.getFormattedTime(it, false)
+                    )
+                    if (ActivityCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.POST_NOTIFICATIONS
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        return@Observer
+                    }
+                    notificationManager.notify(Constants.NOTIFICATION_ID, builder.build())
                 }
-                notificationManager.notify(Constants.NOTIFICATION_ID, builder.build())
-            }
-        })
-
+            },
+        )
     }
 
 
+    /** başlangıç değer ataması yapılır **/
     private fun initValues() {
         timerEvent.postValue(TimerEvent.END)
         timerInMillis.postValue(0L)
     }
 
+    /** servis durdurulur **/
     private fun stopForegroundService() {
         isServiceStopped = true
         initValues()
@@ -103,6 +109,7 @@ class TimerService : LifecycleService() {
         stopSelf()
     }
 
+    /** timerInMillis değerinin sürekli olarak güncellenmesini sağlar **/
     private fun startTimer() {
         val timeStarted = System.currentTimeMillis()
         CoroutineScope(Dispatchers.Main).launch {
@@ -114,6 +121,7 @@ class TimerService : LifecycleService() {
         }
     }
 
+    /** Notification channel oluşturulur **/
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
@@ -123,8 +131,4 @@ class TimerService : LifecycleService() {
         )
         notificationManager.createNotificationChannel(channel)
     }
-
-
-
-
 }

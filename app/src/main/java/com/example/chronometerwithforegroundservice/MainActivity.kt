@@ -21,11 +21,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         handleClickEvents()
         setObservers()
     }
 
+    /** Tıklama dinleyicileri **/
     private fun handleClickEvents() {
         binding.apply {
             fab.setOnClickListener {
@@ -34,21 +34,41 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** dinleme işlemlerinin aktif hale getirilmesi **/
     private fun setObservers() {
+        observeTimerEvent()
+        observeTimerInMillis()
+    }
+
+    /** timerEvent değeri dinlenir **/
+    private fun observeTimerEvent() {
         TimerService.timerEvent.observe(this, Observer {
             when (it) {
                 is TimerEvent.START -> {
-                    isTimerRunning = true
-                    binding.fab.setImageResource(R.drawable.baseline_timer_off_24)
+                    timerStarted()
                 }
 
                 is TimerEvent.END -> {
-                    isTimerRunning = false
-                    binding.fab.setImageResource(R.drawable.baseline_timer_24)
+                    timerStopped()
                 }
             }
         })
+    }
 
+    /** Timer başladığında **/
+    private fun timerStarted() {
+        isTimerRunning = true
+        binding.fab.setImageResource(R.drawable.baseline_timer_off_24)
+    }
+
+    /** Timer sonlandırıldığında **/
+    private fun timerStopped() {
+        isTimerRunning = false
+        binding.fab.setImageResource(R.drawable.baseline_timer_24)
+    }
+
+    /** timer değeri observe edilir, değer formatlanır ve arayüz güncellemesi yapılır **/
+    private fun observeTimerInMillis() {
         TimerService.timerInMillis.observe(this, Observer {
             binding.apply {
                 tvTimer.text = TimerUtil.getFormattedTime(it, true)
@@ -56,6 +76,8 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
+
+    /** isTimerRunning değerine göre servisi durdurmak veya çalıştırmak için kullanılır **/
     private fun toggleTimer() {
         if (isTimerRunning) {
             sendCommandToService(Constants.ACTION_STOP_SERVICE)
@@ -64,14 +86,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /** startService metoduna Intent (action ile birlikte) göndererek servis durum güncellemesi yapılır **/
     private fun sendCommandToService(action: String) {
-        startService(
-            Intent(
-                this,
-                TimerService::class.java
-            ).apply {
-                this.action = action
-            }
-        )
+        startService(Intent(
+            this, TimerService::class.java
+        ).apply {
+            this.action = action
+        })
     }
 }

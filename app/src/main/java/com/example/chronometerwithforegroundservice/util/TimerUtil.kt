@@ -4,6 +4,8 @@ import java.util.concurrent.TimeUnit
 
 
 object TimerUtil {
+
+    /** Long olarak verilen milisaniye değerini biçimlendirerek hh:mm:ss:ms veya hh:mm:ss biçiminde döndürür **/
     fun getFormattedTime(timeInMillis: Long, includeMillis: Boolean): String {
         var milliseconds = timeInMillis
         val hours = TimeUnit.MILLISECONDS.toHours(milliseconds)
