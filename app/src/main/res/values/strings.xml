@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ChronometerWithForegroundService</string>
+    <string name="app_name">Chronometer</string>
+    <string name="notification_label">Label</string>
 </resources>

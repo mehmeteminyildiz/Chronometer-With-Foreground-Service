@@ -41,7 +41,7 @@ object ServiceModule {
         .setAutoCancel(false)
         .setOngoing(true)
         .setSmallIcon(R.drawable.baseline_timer_24)
-        .setContentTitle("Timer lifecycle service demo")
+        .setContentTitle("Timer")
         .setContentText("00:00:00")
         .setContentIntent(pendingIntent)
 

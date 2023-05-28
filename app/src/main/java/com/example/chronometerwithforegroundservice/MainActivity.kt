@@ -1,14 +1,20 @@
 package com.example.chronometerwithforegroundservice
 
+import android.app.NotificationManager
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
 import com.example.chronometerwithforegroundservice.databinding.ActivityMainBinding
 import com.example.chronometerwithforegroundservice.model.TimerEvent
 import com.example.chronometerwithforegroundservice.service.TimerService
 import com.example.chronometerwithforegroundservice.util.Constants
 import com.example.chronometerwithforegroundservice.util.TimerUtil
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,6 +29,36 @@ class MainActivity : AppCompatActivity() {
 
         handleClickEvents()
         setObservers()
+
+        checkNotificationPermissionGranted(context = this)
+    }
+
+    private fun checkNotificationPermissionGranted(context: MainActivity) {
+
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val isEnabled = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            notificationManager.areNotificationsEnabled()
+        } else {
+            NotificationManagerCompat.from(context).areNotificationsEnabled()
+        }
+
+        if (isEnabled) {
+            Timber.e("İzin verilmiş")
+        } else {
+            Timber.e("İzin verilmemiş")
+            notificationPermissionRequest()
+        }
+    }
+
+    private fun notificationPermissionRequest() {
+        val intent = Intent().apply {
+            action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+            putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        }
+        startActivity(intent)
+
     }
 
     /** Tıklama dinleyicileri **/

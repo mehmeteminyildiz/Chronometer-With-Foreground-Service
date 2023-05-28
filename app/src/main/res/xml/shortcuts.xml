@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:shortcutId="my_shortcut"
+        android:enabled="true"
+        android:icon="@drawable/baseline_timer_24"
+        android:shortcutShortLabel="@string/notification_label"
+        android:shortcutLongLabel="@string/notification_label"
+        android:shortcutDisabledMessage="@string/notification_label">
+        <intent
+            android:action="android.intent.action.MAIN"
+            android:targetPackage="com.example.chronometerwithforegroundservice"
+            android:targetClass="com.example.chronometerwithforegroundservice.MainActivity" />
+        <categories android:name="android.shortcut.conversation" />
+    </shortcut>
+</shortcuts>
