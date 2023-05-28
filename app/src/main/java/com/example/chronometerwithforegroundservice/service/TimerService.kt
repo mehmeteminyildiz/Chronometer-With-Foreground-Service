@@ -81,7 +81,7 @@ class TimerService : LifecycleService() {
             while (!isServiceStopped && timerEvent.value == TimerEvent.START) {
                 val lapTime = System.currentTimeMillis() - timeStarted
                 timerInMillis.postValue(lapTime)
-                delay(50L)
+                delay(10L)
             }
         }
     }
