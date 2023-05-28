@@ -105,14 +105,25 @@ class TimerService : LifecycleService() {
         .setContentText("00:00:00")
         .setContentIntent(getMainActivityPendingIntent())
 
-    private fun getMainActivityPendingIntent() =
-        PendingIntent.getActivity(
+    private fun getMainActivityPendingIntent(): PendingIntent {
+        val intent = Intent(this, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
+        }
+        val flags = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            }
+
+            else -> PendingIntent.FLAG_UPDATE_CURRENT
+        }
+
+        return PendingIntent.getActivity(
             this,
             143,
-            Intent(this, MainActivity::class.java).apply {
-                this.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-            },
-            PendingIntent.FLAG_UPDATE_CURRENT
+            intent,
+            flags
         )
+    }
+
 
 }
