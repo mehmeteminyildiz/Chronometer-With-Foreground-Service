@@ -21,11 +21,14 @@ import com.example.chronometerwithforegroundservice.util.Constants
 import com.example.chronometerwithforegroundservice.util.Constants.NOTIFICATION_CHANNEL_ID
 import com.example.chronometerwithforegroundservice.util.Constants.NOTIFICATION_CHANNEL_NAME
 import com.example.chronometerwithforegroundservice.util.TimerUtil
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TimerService : LifecycleService() {
 
     companion object {
@@ -35,11 +38,13 @@ class TimerService : LifecycleService() {
 
     private var isServiceStopped = false
 
-    private lateinit var notificationManager: NotificationManagerCompat
+    @Inject
+    lateinit var notificationManager: NotificationManagerCompat
 
+    @Inject
+    lateinit var notificationBuilder : NotificationCompat.Builder
     override fun onCreate() {
         super.onCreate()
-        notificationManager = NotificationManagerCompat.from(this)
         initValues()
     }
 
@@ -64,11 +69,11 @@ class TimerService : LifecycleService() {
             createNotificationChannel()
         }
 
-        startForeground(Constants.NOTIFICATION_ID, getNotificationBuilder().build())
+        startForeground(Constants.NOTIFICATION_ID, notificationBuilder.build())
 
         timerInMillis.observe(this, Observer {
             if (!isServiceStopped) {
-                val builder = getNotificationBuilder().setContentText(
+                val builder = notificationBuilder.setContentText(
                     TimerUtil.getFormattedTime(it, false)
                 )
                 if (ActivityCompat.checkSelfPermission(
@@ -119,34 +124,7 @@ class TimerService : LifecycleService() {
         notificationManager.createNotificationChannel(channel)
     }
 
-    private fun getNotificationBuilder() = NotificationCompat
-        .Builder(this, Constants.NOTIFICATION_CHANNEL_ID)
-        .setAutoCancel(false)
-        .setOngoing(true)
-        .setSmallIcon(R.drawable.baseline_timer_24)
-        .setContentTitle("Timer lifecycle service demo")
-        .setContentText("00:00:00")
-        .setContentIntent(getMainActivityPendingIntent())
 
-    private fun getMainActivityPendingIntent(): PendingIntent {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
-        }
-        val flags = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-            }
-
-            else -> PendingIntent.FLAG_UPDATE_CURRENT
-        }
-
-        return PendingIntent.getActivity(
-            this,
-            143,
-            intent,
-            flags
-        )
-    }
 
 
 }
