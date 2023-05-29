@@ -6,12 +6,14 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.Observer
 import com.example.chronometerwithforegroundservice.databinding.ActivityMainBinding
 import com.example.chronometerwithforegroundservice.model.TimerEvent
 import com.example.chronometerwithforegroundservice.service.TimerService
+import com.example.chronometerwithforegroundservice.ui.ForegroundAppTestActivity
 import com.example.chronometerwithforegroundservice.util.Constants
 import com.example.chronometerwithforegroundservice.util.TimerUtil
 import timber.log.Timber
@@ -58,7 +60,6 @@ class MainActivity : AppCompatActivity() {
             putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
         }
         startActivity(intent)
-
     }
 
     /** Tıklama dinleyicileri **/
@@ -67,6 +68,16 @@ class MainActivity : AppCompatActivity() {
             fab.setOnClickListener {
                 toggleTimer()
             }
+
+            fab.setOnLongClickListener(object : View.OnLongClickListener {
+                override fun onLongClick(v: View?): Boolean {
+                    val intent = Intent(this@MainActivity, ForegroundAppTestActivity::class.java)
+                    startActivity(intent)
+                    return false
+                }
+
+            })
+
         }
     }
 
